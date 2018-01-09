@@ -1,0 +1,19 @@
+PODS:
+  - HydraAsync (1.2.1)
+  - RxCocoa (4.1.0):
+    - RxSwift (~> 4.0)
+  - RxSwift (4.1.0)
+
+DEPENDENCIES:
+  - HydraAsync
+  - RxCocoa
+  - RxSwift
+
+SPEC CHECKSUMS:
+  HydraAsync: 8f2ab62d57e140b4ca587ae0f66e1eb04e8e6965
+  RxCocoa: cc1fec49cdc8fabe645964de7c51c099a36c2aa8
+  RxSwift: 4219941c1244c88002901bd87a69d3aea9ae71f0
+
+PODFILE CHECKSUM: eb9c350837fdd44b96474a170bc096872deb2f50
+
+COCOAPODS: 1.3.1
