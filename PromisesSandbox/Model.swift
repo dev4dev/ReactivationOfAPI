@@ -8,8 +8,10 @@
 
 import Foundation
 
+typealias JSON = [String: Any]
+
 protocol Mappable {
-    init(value: String) throws
+    init(json: JSON) throws
 }
 
 enum MappingError: Error, AlertRepresentable {
@@ -25,9 +27,34 @@ enum MappingError: Error, AlertRepresentable {
 
 class Model: Mappable {
     let value: String
-    required init(value: String) throws {
+    required init(json: JSON) throws {
         print("mapping \(Thread.isMainThread)")
-        self.value = value
+        self.value = json["value"] as! String
     }
 }
 
+// --
+final class Artist: Mappable {
+    let id: Int
+    let name: String
+    let link: URL
+
+    init(json: JSON) throws {
+
+
+        id = json["id"] as! Int
+        name = json["name"] as! String
+        link = URL(string: json["link"] as! String)!
+    }
+}
+
+final class Album: Mappable {
+    let id: Int
+    let title: String
+
+    init(json: JSON) throws {
+
+        id = json["id"] as! Int
+        title = json["title"] as! String
+    }
+}

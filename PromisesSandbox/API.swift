@@ -34,7 +34,24 @@ final class API {
         return network.request().mapToModel()
     }
 
-    func rxObject() -> Observable<Model> {
-        return network.rxRequest().mapToModel()
+    func object() -> Observable<Model> {
+        return network.request().mapToModel()
+    }
+
+    // --
+    func getArtist() -> Promise<Artist> {
+        return network.get(url: URL(string: "https://api.deezer.com/artist/1")!).mapToModel()
+    }
+
+    func getArtist() -> Observable<Artist> {
+        return network.get(url: URL(string: "https://api.deezer.com/artist/1")!).mapToModel()
+    }
+
+    func getAlbums(for artist: Artist) -> Promise<[Album]> {
+        return network.get(url: URL(string: "https://api.deezer.com/artist/\(artist.id)/albums")!).mapToModels(key: "data")
+    }
+
+    func getAlbums(for artist: Artist) -> Observable<[Album]> {
+        return network.get(url: URL(string: "https://api.deezer.com/artist/\(artist.id)/albums")!).mapToModels(key: "data")
     }
 }

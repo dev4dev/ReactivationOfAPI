@@ -20,20 +20,53 @@ enum NetworkErrors: Error, AlertRepresentable {
 
 final class Network {
 
-    func request() -> Promise<String> {
+    func request() -> Promise<Data> {
         return Promise(in: .background, { resolve, reject, _ in
             if arc4random_uniform(10) > 2 {
-                resolve("OK")
+                resolve("OK".data(using: .utf8)!)
             } else {
                 throw NetworkErrors.noGood
             }
         })
     }
 
-    func rxRequest() -> Observable<String> {
+    func get(url: URL) -> Promise<Data> {
+        return Promise(in: .background, { resolve, reject, _ in
+            URLSession.shared.dataTask(with: url) { data, response, error in
+                if let data = data {
+                    resolve(data)
+                } else if let error = error {
+                    reject(error)
+                }
+            }.resume()
+        })
+
+    }
+
+    func get(url: URL) -> Observable<Data> {
+        return Observable.create { obs in
+            let task = URLSession.shared.dataTask(with: url) { data, response, error in
+                if let data = data {
+                    obs.onNext(data)
+                    obs.onCompleted()
+                } else if let error = error {
+                    obs.onError(error)
+                }
+            }
+
+            task.resume()
+
+            return Disposables.create {
+                task.cancel()
+            }
+        }
+
+    }
+
+    func request() -> Observable<Data> {
         return Observable.create { obs in
             print("Observe \(Thread.isMainThread)")
-            obs.onNext("RxSwift")
+            obs.onNext("RxSwift".data(using: .utf8)!)
             obs.onCompleted()
 
             return Disposables.create()

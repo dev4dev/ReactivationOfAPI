@@ -9,10 +9,24 @@
 import Foundation
 import RxSwift
 
-extension ObservableType where E == String {
+extension ObservableType where E == Data {
     func mapToModel<Model: Mappable>() -> Observable<Model> {
-        return map { json -> Model in
-            return try Model(value: json)
+        return map { jsonData in
+            guard let json = try JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: Any] else { throw MappingError.failed }
+
+            return try Model(json: json)
+        }.observeOn(MainScheduler.instance)
+    }
+
+    func mapToModels<Model: Mappable>(key: String) -> Observable<[Model]> {
+        return map { jsonData in
+            guard let json = try JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: Any] else { throw MappingError.failed }
+            guard let items = json[key] as? [JSON] else { throw MappingError.failed }
+
+            let models = try items.flatMap { json in
+                try Model(json: json)
+            }
+            return models
         }.observeOn(MainScheduler.instance)
     }
 }

@@ -23,8 +23,9 @@ class ViewController: UIViewController {
 
     @IBAction func onRequest(_ sender: UIButton) {
         print("show HUD")
-//        api.object().then(in: .main) { model in
-//            print("Model \(model.value) - \(Thread.isMainThread)")
+        // get album
+//        api.getArtist().then(in: .main) { model in
+//            print("Model \(model.name) - \(Thread.isMainThread)")
 //        }.catch { (error) in
 //            guard let error = error as? AlertRepresentable else { return }
 //            print("Error \(error.message) - \(Thread.isMainThread)")
@@ -32,13 +33,30 @@ class ViewController: UIViewController {
 //            print("hide HUD")
 //        }
 
-        api.rxObject().do(onDispose: {
+        // Promis methods chainig
+//        api.getArtist().then(in: .background, api.getAlbums).then(in: .main) { albums in
+//            print("Albums - \(Thread.isMainThread)")
+//            albums.forEach({ album in
+//                print("-> \(album.title)")
+//            })
+//        }.catch { (error) in
+//            guard let error = error as? AlertRepresentable else { return }
+//            print("Error \(error.message) - \(Thread.isMainThread)")
+//        }.always {
+//            print("hide HUD")
+//        }
+
+        // Rx methods chaining
+        api.getArtist().flatMap(api.getAlbums).do(onDispose: {
             print("hide HUD")
         }).subscribe { event in
             print("sub \(Thread.isMainThread)")
             switch event {
-            case .next(let model):
-                print("Model \(model.value) - \(Thread.isMainThread)")
+            case .next(let albums):
+                print("Model Albums - \(Thread.isMainThread)")
+                albums.forEach({ album in
+                    print("-> \(album.title)")
+                })
             case .error(let error):
                 guard let error = error as? AlertRepresentable else { return }
                 print("Error \(error.message) - \(Thread.isMainThread)")
