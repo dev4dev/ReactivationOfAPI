@@ -78,6 +78,8 @@ class ViewController: UIViewController {
             })
         }.catch { error in
             print(error.localizedDescription)
+        }.always {
+            print("hide HUD")
         }
 
     }
