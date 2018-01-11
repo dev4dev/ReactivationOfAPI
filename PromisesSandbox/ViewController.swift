@@ -8,6 +8,7 @@
 
 import UIKit
 import RxSwift
+import Hydra
 
 class ViewController: UIViewController {
 
@@ -47,23 +48,38 @@ class ViewController: UIViewController {
 //        }
 
         // Rx methods chaining
-        api.getArtist().flatMap(api.getAlbums).do(onDispose: {
-            print("hide HUD")
-        }).subscribe { event in
-            print("sub \(Thread.isMainThread)")
-            switch event {
-            case .next(let albums):
-                print("Model Albums - \(Thread.isMainThread)")
-                albums.forEach({ album in
-                    print("-> \(album.title)")
-                })
-            case .error(let error):
-                guard let error = error as? AlertRepresentable else { return }
-                print("Error \(error.message) - \(Thread.isMainThread)")
-            default:
-                break
-            }
-        }.disposed(by: trash)
+//        api.getArtist().flatMap(api.getAlbums).do(onDispose: {
+//            print("hide HUD")
+//        }).subscribe { event in
+//            print("sub \(Thread.isMainThread)")
+//            switch event {
+//            case .next(let albums):
+//                print("Model Albums - \(Thread.isMainThread)")
+//                albums.forEach({ album in
+//                    print("-> \(album.title)")
+//                })
+//            case .error(let error):
+//                guard let error = error as? AlertRepresentable else { return }
+//                print("Error \(error.message) - \(Thread.isMainThread)")
+//            default:
+//                break
+//            }
+//        }.disposed(by: trash)
+
+        async { _ -> [Album] in
+            print("work - \(Thread.isMainThread)")
+            let artist = try await(self.api.getArtist())
+            let albums = try await(self.api.getAlbums(for: artist))
+            return albums
+        }.then { albums in
+            print("Albums - \(Thread.isMainThread)")
+            albums.forEach({ album in
+                print("-> \(album.title)")
+            })
+        }.catch { error in
+            print(error.localizedDescription)
+        }
+
     }
 }
 
